@@ -61,7 +61,7 @@
 
             // Display stock information
             const currentPrice = data.current_price ? `$${data.current_price.toFixed(2)}` : "N/A";
-            
+
             // Momentum Analysis
             const momentum = data.momentum ? `
                 <p>1d: ${data.momentum['1d']}%</p>
@@ -93,13 +93,15 @@
                 <p>100.0%: $${data.fibonacci_levels['100.0%']}</p>
             ` : "N/A";
 
-            // Entry and Exit Strategy
+            // Entry and Exit Strategy (fixed structure)
             const entryExit = data.entry_exit ? `
-                <p><strong>Suggested Entry Price:</strong> $${data.entry_exit.entry_price} (Confidence: ${data.entry_exit.confidence}%)</p>
-                <p><strong>Primary Exit Price:</strong> $${data.entry_exit.primary_exit} (Probability: ${data.entry_exit.primary_exit_prob}%)</p>
-                <p><strong>Secondary Exit Price:</strong> $${data.entry_exit.secondary_exit} (Probability: ${data.entry_exit.secondary_exit_prob}%)</p>
-                <p><strong>Stop Loss:</strong> $${data.entry_exit.stop_loss}</p>
-                <p><strong>Risk-Reward Ratio:</strong> ${data.entry_exit.risk_reward}</p>
+                <p><strong>Suggested Entry Price:</strong> $${data.entry_exit.entry.price.toFixed(2)} (Confidence: ${(data.entry_exit.entry.confidence * 100).toFixed(0)}%)</p>
+                <p><strong>Primary Exit Price:</strong> $${data.entry_exit.exit.primary.price.toFixed(2)} (Probability: ${(data.entry_exit.exit.primary.probability * 100).toFixed(0)}%)</p>
+                <p><strong>Primary Trailing Stop:</strong> $${data.entry_exit.exit.primary.trailing_stop.toFixed(2)}</p>
+                <p><strong>Secondary Exit Price:</strong> $${data.entry_exit.exit.secondary.price.toFixed(2)} (Probability: ${(data.entry_exit.exit.secondary.probability * 100).toFixed(0)}%)</p>
+                <p><strong>Secondary Trailing Stop:</strong> $${data.entry_exit.exit.secondary.trailing_stop.toFixed(2)}</p>
+                <p><strong>Stop Loss:</strong> $${data.entry_exit.stop_loss.toFixed(2)}</p>
+                <p><strong>Risk-Reward Ratio:</strong> ${data.entry_exit.risk_reward.toFixed(2)}</p>
             ` : "N/A";
 
             // Price Targets
@@ -126,31 +128,31 @@
                 <h2>Stock Analysis Report for ${symbol.toUpperCase()}</h2>
                 <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
                 <p><strong>Current Price:</strong> ${currentPrice}</p>
-                
+
                 <div class="section-title">Momentum Analysis</div>
                 ${momentum}
-                
+
                 <div class="section-title">Technical Indicators</div>
                 <p><strong>RSI (14):</strong> ${rsi}</p>
                 <p><strong>MACD:</strong> ${macd}</p>
                 <p><strong>Bollinger Band Position:</strong> ${bollingerBand}</p>
-                
+
                 <div class="section-title">Fibonacci Retracement Levels</div>
                 ${fibLevels}
-                
+
                 <div class="section-title">Entry and Exit Strategy</div>
                 ${entryExit}
-                
+
                 <div class="section-title">Price Targets</div>
                 <div><strong>Bullish Targets:</strong>${bullishTargets}</div>
                 <div><strong>Bearish Targets:</strong>${bearishTargets}</div>
-                
+
                 <div class="section-title">5-Day Trade Pattern</div>
                 ${tradePattern}
             `;
         } catch (error) {
             resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
-            console.error(error); // Optional: log detailed error in browser dev tools
+            console.error(error);
         }
     });
 </script>
