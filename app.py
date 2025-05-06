@@ -16,17 +16,44 @@ def analyze():
     if df is None:
         return jsonify({"error": "Invalid data"}), 400
 
+    # Calculate technical indicators, Fibonacci levels, and momentum
     df = bot.calculate_technical_indicators(df)
     fib = bot.calculate_fibonacci_levels(df)
     momentum = bot.calculate_momentum(df)
     trend = bot.predict_trend(df)
+    
+    # Calculate entry/exit strategy
     entry_exit = bot.calculate_entry_exit(df, fib, df['close'].iloc[-1], 0.02)
+    
+    # Calculate 5-day trade pattern
+    trade_pattern = bot.calculate_trade_pattern(df)
 
+    # Calculate price targets
+    bullish_target, bearish_target = bot.calculate_price_targets(df)
+    
+    # Collect technical indicators
+    rsi = df['RSI'][-1] if 'RSI' in df.columns else 'N/A'
+    macd = df['MACD'][-1] if 'MACD' in df.columns else 'N/A'
+    bollinger_band_position = bot.calculate_bollinger_band_position(df)
+    
+    # Build the result dictionary
     result = {
         "momentum": momentum,
         "trend": trend,
-        "entry_exit": entry_exit
+        "entry_exit": entry_exit,
+        "trade_pattern": trade_pattern,  # Add the 5-day trade pattern to the result
+        "price_targets": {
+            "bullish": bullish_target if bullish_target else 'N/A',
+            "bearish": bearish_target if bearish_target else 'N/A'
+        },
+        "technical_indicators": {
+            "RSI": rsi,
+            "MACD": macd,
+            "Bollinger_Band_Position": bollinger_band_position,
+            "Fibonacci_Retracement": fib if fib else 'N/A'
+        }
     }
+    
     return jsonify(result)
 
 if __name__ == "__main__":
