@@ -32,8 +32,8 @@ def analyze():
     bullish_target, bearish_target = bot.calculate_price_targets(df)
     
     # Collect technical indicators
-    rsi = df['RSI'][-1] if 'RSI' in df.columns else 'N/A'
-    macd = df['MACD'][-1] if 'MACD' in df.columns else 'N/A'
+    rsi = float(df['RSI'].dropna().iloc[-1]) if 'RSI' in df.columns and not df['RSI'].dropna().empty else 'N/A'
+    macd = float(df['MACD'].dropna().iloc[-1]) if 'MACD' in df.columns and not df['MACD'].dropna().empty else 'N/A'
     bollinger_band_position = bot.calculate_bollinger_band_position(df)
     
     # Build the result dictionary
