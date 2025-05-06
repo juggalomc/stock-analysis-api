@@ -25,6 +25,10 @@
         color: red;
         font-weight: bold;
     }
+    .section-title {
+        font-weight: bold;
+        margin-top: 30px;
+    }
     </style>
 </head>
 <body>
@@ -55,24 +59,94 @@
                 return;
             }
 
-            // Safely handle trend as it might be an object
-            const trend = typeof data.trend === "object" ? JSON.stringify(data.trend) : data.trend || "N/A";
+            // Display stock information
+            const currentPrice = data.current_price ? `$${data.current_price.toFixed(2)}` : "N/A";
+            
+            // Momentum Analysis
+            const momentum = data.momentum ? `
+                <p>1d: ${data.momentum['1d']}%</p>
+                <p>1d_avg: ${data.momentum['1d_avg']}%</p>
+                <p>1d_vol: ${data.momentum['1d_vol']}%</p>
+                <p>5d: ${data.momentum['5d']}%</p>
+                <p>5d_avg: ${data.momentum['5d_avg']}%</p>
+                <p>5d_vol: ${data.momentum['5d_vol']}%</p>
+                <p>10d: ${data.momentum['10d']}%</p>
+                <p>10d_avg: ${data.momentum['10d_avg']}%</p>
+                <p>10d_vol: ${data.momentum['10d_vol']}%</p>
+                <p>20d: ${data.momentum['20d']}%</p>
+                <p>20d_avg: ${data.momentum['20d_avg']}%</p>
+                <p>20d_vol: ${data.momentum['20d_vol']}%</p>
+            ` : "N/A";
 
-            const momentum = (typeof data.momentum === "number") ? data.momentum.toFixed(2) : "N/A";
-            const buyBelow = (typeof data.entry_exit?.buy_below === "number") ? data.entry_exit.buy_below.toFixed(2) : "N/A";
-            const sellAbove = (typeof data.entry_exit?.sell_above === "number") ? data.entry_exit.sell_above.toFixed(2) : "N/A";
-            const stopLoss = (typeof data.entry_exit?.stop_loss === "number") ? data.entry_exit.stop_loss.toFixed(2) : "N/A";
+            // Technical Indicators
+            const rsi = data.technical_indicators?.RSI || "N/A";
+            const macd = data.technical_indicators?.MACD || "N/A";
+            const bollingerBand = data.technical_indicators?.bollinger_band || "N/A";
+
+            // Fibonacci Retracement Levels
+            const fibLevels = data.fibonacci_levels ? `
+                <p>0.0%: $${data.fibonacci_levels['0.0%']}</p>
+                <p>23.6%: $${data.fibonacci_levels['23.6%']}</p>
+                <p>38.2%: $${data.fibonacci_levels['38.2%']}</p>
+                <p>50.0%: $${data.fibonacci_levels['50.0%']}</p>
+                <p>61.8%: $${data.fibonacci_levels['61.8%']}</p>
+                <p>100.0%: $${data.fibonacci_levels['100.0%']}</p>
+            ` : "N/A";
+
+            // Entry and Exit Strategy
+            const entryExit = data.entry_exit ? `
+                <p><strong>Suggested Entry Price:</strong> $${data.entry_exit.entry_price} (Confidence: ${data.entry_exit.confidence}%)</p>
+                <p><strong>Primary Exit Price:</strong> $${data.entry_exit.primary_exit} (Probability: ${data.entry_exit.primary_exit_prob}%)</p>
+                <p><strong>Secondary Exit Price:</strong> $${data.entry_exit.secondary_exit} (Probability: ${data.entry_exit.secondary_exit_prob}%)</p>
+                <p><strong>Stop Loss:</strong> $${data.entry_exit.stop_loss}</p>
+                <p><strong>Risk-Reward Ratio:</strong> ${data.entry_exit.risk_reward}</p>
+            ` : "N/A";
+
+            // Price Targets
+            const bullishTargets = data.price_targets?.bullish ? data.price_targets.bullish.map(target => `
+                <p>${target.percentage}%: $${target.price} (Probability: ${target.probability}%, Expected: ${target.expected_days} days)</p>
+            `).join('') : "N/A";
+
+            const bearishTargets = data.price_targets?.bearish ? data.price_targets.bearish.map(target => `
+                <p>${target.percentage}%: $${target.price} (Probability: ${target.probability}%, Expected: ${target.expected_days} days)</p>
+            `).join('') : "N/A";
+
+            // 5-Day Trade Pattern
+            const tradePattern = data.trade_pattern ? data.trade_pattern.map(day => `
+                <p><strong>Day ${day.day} (${day.date}):</strong></p>
+                <ul>
+                    <li>Action: ${day.action}</li>
+                    <li>Target Price: $${day.target_price}</li>
+                    <li>Stop Loss: $${day.stop_loss}</li>
+                    <li>Conditions: ${day.conditions.join(", ")}</li>
+                </ul>
+            `).join('') : "N/A";
 
             resultDiv.innerHTML = `
-                <h2>Results for <b>${symbol.toUpperCase()}</b></h2>
-                <p><strong>Trend:</strong> ${trend}</p>
-                <p><strong>Momentum:</strong> ${momentum}</p>
-                <h3>Entry & Exit Points</h3>
-                <ul>
-                    <li><strong>Buy Below:</strong> $${buyBelow}</li>
-                    <li><strong>Sell Above:</strong> $${sellAbove}</li>
-                    <li><strong>Stop Loss:</strong> $${stopLoss}</li>
-                </ul>
+                <h2>Stock Analysis Report for ${symbol.toUpperCase()}</h2>
+                <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>Current Price:</strong> ${currentPrice}</p>
+                
+                <div class="section-title">Momentum Analysis</div>
+                ${momentum}
+                
+                <div class="section-title">Technical Indicators</div>
+                <p><strong>RSI (14):</strong> ${rsi}</p>
+                <p><strong>MACD:</strong> ${macd}</p>
+                <p><strong>Bollinger Band Position:</strong> ${bollingerBand}</p>
+                
+                <div class="section-title">Fibonacci Retracement Levels</div>
+                ${fibLevels}
+                
+                <div class="section-title">Entry and Exit Strategy</div>
+                ${entryExit}
+                
+                <div class="section-title">Price Targets</div>
+                <div><strong>Bullish Targets:</strong>${bullishTargets}</div>
+                <div><strong>Bearish Targets:</strong>${bearishTargets}</div>
+                
+                <div class="section-title">5-Day Trade Pattern</div>
+                ${tradePattern}
             `;
         } catch (error) {
             resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
