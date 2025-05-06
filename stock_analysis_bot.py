@@ -215,16 +215,33 @@ class StockAnalysisBot:
             
             # Range-bound scenario
             else:
-                day_plan['action'] = 'buy' if day <= 2 else 'hold'
-                day_plan['conditions'] = [
-                    f"Price near ${entry_exit['entry']['price']:.2f}",
-                    f"Breakout above ${df['bb_upper'].iloc[-1]:.2f} or pullback to ${df['bb_lower'].iloc[-1]:.2f}"
-                ]
-                day_plan['target_price'] = entry_exit['exit']['primary']['price']
-            
+                if day == 1:
+                    day_plan['action'] = 'buy'
+                    day_plan['conditions'] = [
+                        f"Price near support (50% Fib): ${entry_exit['entry']['price']:.2f}",
+                        f"RSI neutral (current: {df['rsi'].iloc[-1]:.2f})",
+                        "No strong MACD signal"
+                    ]
+                    day_plan['target_price'] = entry_exit['exit']['primary']['price']
+                elif day in [2, 3, 4]:
+                    day_plan['action'] = 'hold'
+                    day_plan['conditions'] = [
+                        f"Price above entry: ${entry_exit['entry']['price']:.2f}",
+                        f"Trailing stop active: ${entry_exit['exit']['primary']['trailing_stop']:.2f}"
+                    ]
+                    day_plan['target_price'] = entry_exit['exit']['secondary']['price'] if day == 4 else entry_exit['exit']['primary']['price']
+                else:
+                    day_plan['action'] = 'sell'
+                    day_plan['conditions'] = [
+                        "Time-based exit at end of week",
+                        f"Profit near or above target: ${entry_exit['exit']['secondary']['price']:.2f}"
+                    ]
+                    day_plan['target_price'] = entry_exit['exit']['secondary']['price']
+
             trade_pattern.append(day_plan)
         
         return trade_pattern
+
 
     def calculate_targets(self, df, fib_levels, trend_prediction):
         """Calculate precise price targets and expected dates."""
