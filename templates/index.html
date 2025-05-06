@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Analyzer</title>
+</head>
+<body>
+    <h1>Stock Analysis Tool</h1>
+    <form id="form">
+        <input type="text" name="symbol" placeholder="Enter stock symbol" required />
+        <button type="submit">Analyze</button>
+    </form>
+    <pre id="result"></pre>
+
+   <script>
+    const form = document.getElementById("form");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const symbol = form.symbol.value;
+        try {
+            const response = await fetch(`/api/analyze?symbol=${symbol}`);
+            const data = await response.json();
+            document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+            document.getElementById("result").textContent = "Error fetching data.";
+        }
+    });
+</script>
+</body>
+</html>
