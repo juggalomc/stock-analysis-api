@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,8 +14,18 @@
     h1, h2, h3 {
         margin-top: 20px;
     }
-</style>
-
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    li {
+        margin-bottom: 10px;
+    }
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+    </style>
 </head>
 <body>
     <h1>Stock Analysis Tool</h1>
@@ -35,26 +44,36 @@
 
         try {
             const response = await fetch(`/api/analyze?symbol=${symbol}`);
-            const data = await response.json();
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Server error: ${text}`);
+            }
 
+            const data = await response.json();
             if (data.error) {
-                resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                resultDiv.innerHTML = `<p class="error">${data.error}</p>`;
                 return;
             }
 
+            const momentum = (typeof data.momentum === "number") ? data.momentum.toFixed(2) : "N/A";
+            const buyBelow = (typeof data.entry_exit?.buy_below === "number") ? data.entry_exit.buy_below.toFixed(2) : "N/A";
+            const sellAbove = (typeof data.entry_exit?.sell_above === "number") ? data.entry_exit.sell_above.toFixed(2) : "N/A";
+            const stopLoss = (typeof data.entry_exit?.stop_loss === "number") ? data.entry_exit.stop_loss.toFixed(2) : "N/A";
+
             resultDiv.innerHTML = `
                 <h2>Results for <b>${symbol.toUpperCase()}</b></h2>
-                <p><strong>Trend:</strong> ${data.trend}</p>
-                <p><strong>Momentum:</strong> ${data.momentum.toFixed(2)}</p>
+                <p><strong>Trend:</strong> ${data.trend || "N/A"}</p>
+                <p><strong>Momentum:</strong> ${momentum}</p>
                 <h3>Entry & Exit Points</h3>
                 <ul>
-                    <li><strong>Buy Below:</strong> $${data.entry_exit.buy_below.toFixed(2)}</li>
-                    <li><strong>Sell Above:</strong> $${data.entry_exit.sell_above.toFixed(2)}</li>
-                    <li><strong>Stop Loss:</strong> $${data.entry_exit.stop_loss.toFixed(2)}</li>
+                    <li><strong>Buy Below:</strong> $${buyBelow}</li>
+                    <li><strong>Sell Above:</strong> $${sellAbove}</li>
+                    <li><strong>Stop Loss:</strong> $${stopLoss}</li>
                 </ul>
             `;
         } catch (error) {
-            resultDiv.innerHTML = `<p style="color: red;">Error fetching data.</p>`;
+            resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            console.error(error); // Optional: log detailed error in browser dev tools
         }
     });
 </script>
