@@ -16,26 +16,17 @@ def analyze():
     if df is None:
         return jsonify({"error": "Invalid data"}), 400
 
-    # Calculate technical indicators, Fibonacci levels, and momentum
     df = bot.calculate_technical_indicators(df)
     fib = bot.calculate_fibonacci_levels(df)
     momentum = bot.calculate_momentum(df)
     trend = bot.predict_trend(df)
-    
-    # Calculate entry/exit strategy
     entry_exit = bot.calculate_entry_exit(df, fib, df['close'].iloc[-1], 0.02)
-    
-    # Calculate 5-day trade pattern
-    trade_pattern = bot.calculate_trade_pattern(df)
 
-    # Build the result dictionary
     result = {
         "momentum": momentum,
         "trend": trend,
-        "entry_exit": entry_exit,
-        "trade_pattern": trade_pattern  # Add the 5-day trade pattern to the result
+        "entry_exit": entry_exit
     }
-    
     return jsonify(result)
 
 if __name__ == "__main__":
