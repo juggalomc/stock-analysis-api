@@ -28,30 +28,12 @@ def analyze():
     # Calculate 5-day trade pattern
     trade_pattern = bot.calculate_trade_pattern(df)
 
-    # Calculate price targets
-    bullish_target, bearish_target = bot.calculate_price_targets(df)
-    
-    # Collect technical indicators
-    rsi = float(df['RSI'].dropna().iloc[-1]) if 'RSI' in df.columns and not df['RSI'].dropna().empty else 'N/A'
-    macd = float(df['MACD'].dropna().iloc[-1]) if 'MACD' in df.columns and not df['MACD'].dropna().empty else 'N/A'
-    bollinger_band_position = bot.calculate_bollinger_band_position(df)
-    
     # Build the result dictionary
     result = {
         "momentum": momentum,
         "trend": trend,
         "entry_exit": entry_exit,
-        "trade_pattern": trade_pattern,  # Add the 5-day trade pattern to the result
-        "price_targets": {
-            "bullish": bullish_target if bullish_target else 'N/A',
-            "bearish": bearish_target if bearish_target else 'N/A'
-        },
-        "technical_indicators": {
-            "RSI": rsi,
-            "MACD": macd,
-            "Bollinger_Band_Position": bollinger_band_position,
-            "Fibonacci_Retracement": fib if fib else 'N/A'
-        }
+        "trade_pattern": trade_pattern  # Add the 5-day trade pattern to the result
     }
     
     return jsonify(result)
