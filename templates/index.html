@@ -1,7 +1,22 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Stock Analyzer</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    input, button {
+        font-size: 16px;
+        padding: 5px 10px;
+    }
+    h1, h2, h3 {
+        margin-top: 20px;
+    }
+</style>
+
 </head>
 <body>
     <h1>Stock Analysis Tool</h1>
@@ -9,21 +24,40 @@
         <input type="text" name="symbol" placeholder="Enter stock symbol" required />
         <button type="submit">Analyze</button>
     </form>
-    <pre id="result"></pre>
+    <div id="result" style="margin-top: 20px;"></div>
 
-   <script>
+<script>
     const form = document.getElementById("form");
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const symbol = form.symbol.value;
+        const resultDiv = document.getElementById("result");
+
         try {
             const response = await fetch(`/api/analyze?symbol=${symbol}`);
             const data = await response.json();
-            document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+
+            if (data.error) {
+                resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                return;
+            }
+
+            resultDiv.innerHTML = `
+                <h2>Results for <b>${symbol.toUpperCase()}</b></h2>
+                <p><strong>Trend:</strong> ${data.trend}</p>
+                <p><strong>Momentum:</strong> ${data.momentum.toFixed(2)}</p>
+                <h3>Entry & Exit Points</h3>
+                <ul>
+                    <li><strong>Buy Below:</strong> $${data.entry_exit.buy_below.toFixed(2)}</li>
+                    <li><strong>Sell Above:</strong> $${data.entry_exit.sell_above.toFixed(2)}</li>
+                    <li><strong>Stop Loss:</strong> $${data.entry_exit.stop_loss.toFixed(2)}</li>
+                </ul>
+            `;
         } catch (error) {
-            document.getElementById("result").textContent = "Error fetching data.";
+            resultDiv.innerHTML = `<p style="color: red;">Error fetching data.</p>`;
         }
     });
 </script>
+
 </body>
 </html>
