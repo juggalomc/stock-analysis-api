@@ -55,6 +55,9 @@
                 return;
             }
 
+            // Safely handle trend as it might be an object
+            const trend = typeof data.trend === "object" ? JSON.stringify(data.trend) : data.trend || "N/A";
+
             const momentum = (typeof data.momentum === "number") ? data.momentum.toFixed(2) : "N/A";
             const buyBelow = (typeof data.entry_exit?.buy_below === "number") ? data.entry_exit.buy_below.toFixed(2) : "N/A";
             const sellAbove = (typeof data.entry_exit?.sell_above === "number") ? data.entry_exit.sell_above.toFixed(2) : "N/A";
@@ -62,7 +65,7 @@
 
             resultDiv.innerHTML = `
                 <h2>Results for <b>${symbol.toUpperCase()}</b></h2>
-                <p><strong>Trend:</strong> ${data.trend || "N/A"}</p>
+                <p><strong>Trend:</strong> ${trend}</p>
                 <p><strong>Momentum:</strong> ${momentum}</p>
                 <h3>Entry & Exit Points</h3>
                 <ul>
